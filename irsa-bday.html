@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="ur">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Birthday Surprise — Irsa Butt</title>
+<style>
+  :root{ --bg:#0f172a; --card:#0b1220; --accent:#ff7ab6; --text:#f8fafc }
+  html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Sans",sans-serif;background:linear-gradient(180deg,#071129 0%, #081827 50%, #0b1220 100%);color:var(--text)}
+  .wrap{height:100%;display:flex;align-items:center;justify-content:center;padding:24px;box-sizing:border-box}
+  .card{width:100%;max-width:520px;background:rgba(255,255,255,0.03);border-radius:16px;padding:28px;text-align:center;box-shadow:0 10px 30px rgba(2,6,23,0.6);backdrop-filter: blur(6px)}
+  h1{margin:0 0 8px;font-size:20px;letter-spacing:0.4px}
+  .sub{opacity:0.8;margin-bottom:18px}
+  .bighint{font-size:18px;margin:18px 0;padding:16px;border-radius:12px;background:linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:inset 0 1px 0 rgba(255,255,255,0.02)}
+  .tap-area{height:160px;border-radius:12px;border:2px dashed rgba(255,255,255,0.06);display:flex;align-items:center;justify-content:center;flex-direction:column;user-select:none}
+  .tap-count{font-size:36px;margin-top:10px;font-weight:700}
+  .small{font-size:13px;opacity:0.8;margin-top:8px}
+  /* modal */
+  .modal{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;visibility:hidden;opacity:0;transition:opacity .4s ease,visibility .4s;}
+  .modal.show{visibility:visible;opacity:1}
+  .wish{width:90%;max-width:640px;padding:28px;border-radius:18px;background:linear-gradient(135deg,#121827, #0b1730);box-shadow:0 20px 60px rgba(2,6,23,0.7);text-align:center;color:var(--text)}
+  .wish h2{margin:0;font-size:28px}
+  .wish p{margin:12px 0;font-size:16px;opacity:0.95}
+  .cake{font-size:46px;margin-top:12px;display:block}
+  .close-btn{margin-top:16px;padding:10px 18px;border-radius:12px;background:linear-gradient(90deg,var(--accent),#ffb86b);border:none;font-weight:700;cursor:pointer}
+  /* confetti */
+  .confetti-piece{position:fixed;width:12px;height:18px;opacity:0;pointer-events:none;will-change:transform,opacity}
+  @keyframes fall{
+    0%{transform:translateY(-10vh) rotate(0deg);opacity:1}
+    100%{transform:translateY(110vh) rotate(720deg);opacity:1}
+  }
+  footer{margin-top:14px;font-size:12px;opacity:0.7}
+  /* responsive */
+  @media (max-width:420px){ .tap-area{height:140px} .wish h2{font-size:22px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="card" role="main">
+    <h1>🎉 Surprise For Irsa Butt</h1>
+    <div class="sub">Ek chhoti si coding surprise — Chrome mein link open kar ke box par <strong>3 dafa</strong> jaldi se tap karein.</div>
+
+    <div class="bighint">
+      <div class="tap-area" id="tapArea" aria-label="Tap area">
+        <div style="font-size:18px">Tap 3 dafa — tezi se!</div>
+        <div class="tap-count" id="tapCount">0</div>
+        <div class="small">Mobile: screen pe 3 tezi taps | Desktop: click 3 baar</div>
+      </div>
+    </div>
+
+    <footer>From: Ahmad — Happy Birthday Irsa Butt 🥳</footer>
+  </div>
+</div>
+
+<!-- modal / wish -->
+<div id="modal" class="modal" role="dialog" aria-hidden="true">
+  <div class="wish" role="document">
+    <div style="font-size:36px">🎈🎉</div>
+    <h2 id="wishTitle">Happy Birthday, Irsa Butt!</h2>
+    <p id="wishMsg">Aaj ka din tumhare liye khushiyon se bharpur ho. Dua hai tum hamesha muskurati raho aur har khwaish poori ho. 💖</p>
+    <div class="cake">🎂✨</div>
+    <button class="close-btn" id="closeBtn">Close</button>
+  </div>
+</div>
+
+<script>
+(function(){
+  const tapArea = document.getElementById('tapArea');
+  const tapCountEl = document.getElementById('tapCount');
+  const modal = document.getElementById('modal');
+  const closeBtn = document.getElementById('closeBtn');
+  let taps = 0;
+  let lastTap = 0;
+  const MAX_INTERVAL = 700; // ms within which triple taps must happen
+
+  function resetTaps(){
+    taps = 0;
+    tapCountEl.textContent = '0';
+  }
+
+  function showWish(){
+    // personalize
+    document.getElementById('wishTitle').textContent = 'Happy Birthday, Irsa Butt!';
+    document.getElementById('wishMsg').textContent = 'Aaj tumhara din khushiyon se bhara ho. Tum hamesha muskurati raho! 💖';
+    modal.classList.add('show');
+    modal.setAttribute('aria-hidden','false');
+    // confetti
+    launchConfetti(28);
+  }
+
+  tapArea.addEventListener('touchstart', tapped, {passive:true});
+  tapArea.addEventListener('click', tapped);
+
+  function tapped(e){
+    const now = Date.now();
+    if(now - lastTap <= MAX_INTERVAL){
+      taps++;
+    } else {
+      taps = 1;
+    }
+    lastTap = now;
+    tapCountEl.textContent = String(taps);
+    if(taps >= 3){
+      resetTaps();
+      showWish();
+    }
+    // auto reset after a short time
+    clearTimeout(tapArea._timer);
+    tapArea._timer = setTimeout(resetTaps, MAX_INTERVAL + 100);
+  }
+
+  closeBtn.addEventListener('click', ()=>{
+    modal.classList.remove('show');
+    modal.setAttribute('aria-hidden','true');
+  });
+
+  // allow tap outside to close
+  modal.addEventListener('click', (ev)=>{
+    if(ev.target === modal) { modal.classList.remove('show'); modal.setAttribute('aria-hidden','true'); }
+  });
+
+  // simple confetti by creating emoji elements
+  function launchConfetti(n){
+    const colors = ['🎉','✨','🎈','💖','🌟','🎊'];
+    for(let i=0;i<n;i++){
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.left = (Math.random()*100) + 'vw';
+      el.style.top = (-10 - Math.random()*20) + 'vh';
+      el.style.fontSize = (12 + Math.random()*30) + 'px';
+      el.textContent = colors[Math.floor(Math.random()*colors.length)];
+      document.body.appendChild(el);
+      // animate
+      const dur = 2000 + Math.random()*2200;
+      el.style.opacity = '1';
+      el.style.transition = 'transform linear ' + dur + 'ms';
+      // set transform after short delay to trigger
+      setTimeout(()=>{
+        el.style.transform = 'translateY(120vh) rotate(' + (360 + Math.random()*720) + 'deg)';
+      },20);
+      // remove later
+      setTimeout(()=>{ el.remove(); }, dur + 800);
+    }
+  }
+
+  // Accessibility: if user presses 'w' key 3 times quickly on desktop
+  let keyTaps=0, lastKey=0;
+  document.addEventListener('keydown', (e)=>{
+    const now = Date.now();
+    if(e.key.toLowerCase() === 'w'){
+      if(now - lastKey <= MAX_INTERVAL) keyTaps++; else keyTaps=1;
+      lastKey = now;
+      if(keyTaps>=3){ keyTaps=0; showWish(); }
+    }
+  });
+
+})();
+</script>
+</body>
+</html>
